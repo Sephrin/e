@@ -9,30 +9,137 @@ END_EVENT_TABLE()
 // access to the original wxTabFrame definition in auibook.cpp
 // Doing it like this is a fragile hack, but it lets us
 // avoid patching wxWidgets.
+//class wxTabFrame : public wxWindow
+//{
+//public:
+//    wxTabFrame();
+//    ~wxTabFrame();
+//    void SetTabCtrlHeight(int h)
+//    {
+//        m_tab_ctrl_height = h;
+//    }
+//    void DoSetSize(int x, int y,
+//                   int width, int height,
+//                   int WXUNUSED(sizeFlags = wxSIZE_AUTO));
+//    void DoGetClientSize(int* x, int* y) const;
+//    bool Show( bool WXUNUSED(show = true) );
+//    void DoSizing();
+//    void DoGetSize(int* x, int* y) const;
+//    void Update();
+//
+//public:
+//    wxRect m_rect;
+//    wxRect m_tab_rect;
+//    wxAuiTabCtrl* m_tabs;
+//    int m_tab_ctrl_height;
+//};
+
+// Copied from wx
+
 class wxTabFrame : public wxWindow
 {
 public:
-    wxTabFrame();
-    ~wxTabFrame();
+
+    wxTabFrame()
+    {
+        m_tabs = NULL;
+        m_rect = wxRect(0,0,200,200);
+        m_tab_ctrl_height = 20;
+    }
+
+    ~wxTabFrame()
+    {
+        wxDELETE(m_tabs);
+    }
+
     void SetTabCtrlHeight(int h)
     {
         m_tab_ctrl_height = h;
     }
+
     void DoSetSize(int x, int y,
                    int width, int height,
-                   int WXUNUSED(sizeFlags = wxSIZE_AUTO));
-    void DoGetClientSize(int* x, int* y) const;
-    bool Show( bool WXUNUSED(show = true) );
-    void DoSizing();
-    void DoGetSize(int* x, int* y) const;
-    void Update();
+                   int WXUNUSED(sizeFlags = wxSIZE_AUTO))
+    {
+        m_rect = wxRect(x, y, width, height);
+        DoSizing();
+    }
+
+    void DoGetClientSize(int* x, int* y) const
+    {
+        *x = m_rect.width;
+        *y = m_rect.height;
+    }
+
+    bool Show( bool WXUNUSED(show = true) ) { return false; }
+
+    void DoSizing()
+    {
+        if (!m_tabs)
+            return;
+
+        if (m_tabs->GetFlags() & wxAUI_NB_BOTTOM)
+        {
+            m_tab_rect = wxRect (m_rect.x, m_rect.y + m_rect.height - m_tab_ctrl_height, m_rect.width, m_tab_ctrl_height);
+            m_tabs->SetSize     (m_rect.x, m_rect.y + m_rect.height - m_tab_ctrl_height, m_rect.width, m_tab_ctrl_height);
+            m_tabs->SetRect     (wxRect(0, 0, m_rect.width, m_tab_ctrl_height));
+        }
+        else //TODO: if (GetFlags() & wxAUI_NB_TOP)
+        {
+            m_tab_rect = wxRect (m_rect.x, m_rect.y, m_rect.width, m_tab_ctrl_height);
+            m_tabs->SetSize     (m_rect.x, m_rect.y, m_rect.width, m_tab_ctrl_height);
+            m_tabs->SetRect     (wxRect(0, 0,        m_rect.width, m_tab_ctrl_height));
+        }
+        // TODO: else if (GetFlags() & wxAUI_NB_LEFT){}
+        // TODO: else if (GetFlags() & wxAUI_NB_RIGHT){}
+
+        m_tabs->Refresh();
+        m_tabs->Update();
+
+        wxAuiNotebookPageArray& pages = m_tabs->GetPages();
+        size_t i, page_count = pages.GetCount();
+
+        for (i = 0; i < page_count; ++i)
+        {
+            wxAuiNotebookPage& page = pages.Item(i);
+            if (m_tabs->GetFlags() & wxAUI_NB_BOTTOM)
+            {
+               page.window->SetSize(m_rect.x, m_rect.y,
+                                    m_rect.width, m_rect.height - m_tab_ctrl_height);
+            }
+            else //TODO: if (GetFlags() & wxAUI_NB_TOP)
+            {
+                page.window->SetSize(m_rect.x, m_rect.y + m_tab_ctrl_height,
+                                    m_rect.width, m_rect.height - m_tab_ctrl_height);
+            }
+            // TODO: else if (GetFlags() & wxAUI_NB_LEFT){}
+            // TODO: else if (GetFlags() & wxAUI_NB_RIGHT){}
+
+        }
+    }
+
+    void DoGetSize(int* x, int* y) const
+    {
+        if (x)
+            *x = m_rect.GetWidth();
+        if (y)
+            *y = m_rect.GetHeight();
+    }
+
+    void Update()
+    {
+        // does nothing
+    }
 
 public:
+
     wxRect m_rect;
     wxRect m_tab_rect;
     wxAuiTabCtrl* m_tabs;
     int m_tab_ctrl_height;
 };
+
+// End copied from wx
 
 // Constructor
 eAuiNotebook::eAuiNotebook(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style):

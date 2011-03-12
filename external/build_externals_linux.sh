@@ -8,7 +8,7 @@ if [ x"$variant" == x"release" ] ; then
     webkit_output="Release"
     tinyxml_switches="DEBUG=YES"
     CPPFLAGS="-O2"
-    LDFLAGS="-g"
+    LDFLAGS="-g -lX11 -lcairo"
 elif [ x"$variant" == x"debug" ] ; then
     echo "Building debug binaries"
     output=`pwd`/out.debug
@@ -49,6 +49,7 @@ cd builds &&
     make install ||
         ( echo "Cannot compile MetaKit" ; exit 1 )
 popd
+#read -p "Press any key to continue..."
 
 # PCRE
 pushd pcre
@@ -59,6 +60,7 @@ pushd pcre
     cp config.h ucp.h pcre_internal.h $output/include ||
         ( echo "Cannot compile pcre" ; exit 1 )
 popd
+#read -p "Press any key to continue..."
 
 # tinyxml
 pushd tinyxml
@@ -70,6 +72,7 @@ make clean &&
     cp -f ./*.h $output/include/ ||
         ( echo "cannot compile TinyXML" ; exit 1 )
 popd
+#read -p "Press any key to continue..."
 
 # libtommath
 pushd libtommath
@@ -78,6 +81,7 @@ make clean &&
     make install INSTALL_GROUP=`id -gn` INSTALL_USER=`id -un` LIBPATH=$output/lib INCPATH=$output/include DATAPATH=$output/share/doc/libtommath/pdf ||
         ( echo "Cannot compile LTM" ; exit 1 )
 popd
+#read -p "Press any key to continue..."
 
 # libtomcrypt
 pushd libtomcrypt
@@ -86,6 +90,7 @@ make clean &&
     make install INSTALL_GROUP=`id -gn` INSTALL_USER=`id -un` LIBPATH=$output/lib INCPATH=$output/include DATAPATH=$output/share/doc/libtomcrypt/pdf NODOCS=1 ||
         ( echo "Cannot compile LTC" ; exit 1 )
 popd
+#read -p "Press any key to continue..."
 
 # wxwidgets
 pushd wxwidgets
@@ -97,6 +102,7 @@ pushd wxwidgets
     make install ||
         ( echo "Cannot compile wxWidgets"; exit 1 )
 popd
+read -p "Press any key to continue..."
 
 # wxwebkit
 pushd webkit
@@ -107,8 +113,11 @@ PATH="$output/bin:${PATH}" ./WebKitTools/Scripts/build-webkit --wx --wx-args=wxg
     strip -g $output/lib/libwxwebkit.a ||
         ( echo "Cannot compile WebKit" ; exit 1 )
 popd
+read -p "Press any key to continue..."
 
 # boost
 pushd boost
 ./bootstrap.sh && ./bjam link=static runtime-link=static variant=$variant --prefix=$output install
 popd
+read -p "Press any key to continue..."
+

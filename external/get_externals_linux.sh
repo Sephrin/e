@@ -19,7 +19,7 @@ _download()
     http://github.com/ajpalkovic/e/raw/master/external/downloads/crypt-1.11.tar.bz2 \
     http://github.com/ajpalkovic/e/raw/master/external/downloads/ltm-0.39.tar.bz2 \
     http://www.equi4.com/pub/mk/metakit-2.4.9.7.tar.gz \
-    ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-7.9.tar.gz \
+    http://autosetup1.googlecode.com/files/pcre-7.9.tar.gz \
     http://kent.dl.sourceforge.net/sourceforge/tinyxml/tinyxml_2_5_3.tar.gz \
     http://biolpc22.york.ac.uk/pub/2.8.10/wxWidgets-2.8.10.tar.bz2 \
     http://builds.nightly.webkit.org/files/trunk/src/WebKit-r68833.tar.bz2 \

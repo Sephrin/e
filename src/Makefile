@@ -81,7 +81,7 @@ all: $(EXE)
 
 $(EXE): $(OBJS)
 	@$(ECHO) "[LD] $@"
-	$(SILENT)$(CXX) $(LDFLAGS) -o $(EXE) $(OBJS) $(LIBS) $(EXTOBJS)
+	$(SILENT)$(CXX) $(LDFLAGS) -lpangocairo-1.0 -o $(EXE) $(OBJS) $(LIBS) $(EXTOBJS)
 
 $(OUTDIR)/%.o: %.cpp
 	@-mkdir -p $(OUTDIR) $(OUTDIR)/hessian_ipc $(OUTDIR)/webconnect
